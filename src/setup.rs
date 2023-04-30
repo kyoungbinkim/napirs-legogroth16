@@ -50,7 +50,7 @@ pub fn setup_from_circom_r1cs<E:Pairing>(
     seed:u64
 ) -> (ProvingKeyWithLink<E>, ProvingKey<E>){
     let circuit: CircomCircuit<E> = CircomCircuit::<E>::from_r1cs_file(abs_path(r1cs_file_path)).unwrap();
-    gen_params(commit_witness_count, circuit.clone(), seed)
+    gen_params::<E>(commit_witness_count, circuit.clone(), seed)
 }
 
 pub fn setup_from_circom_r1cs_bn128(
