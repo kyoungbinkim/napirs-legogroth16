@@ -1,6 +1,6 @@
 import b from 'benny'
 
-import { plus100 } from '../index'
+import { plus100 } from '../test'
 
 function add(a: number) {
   return a + 100
