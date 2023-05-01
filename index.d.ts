@@ -8,18 +8,33 @@ export function setupFromCircomR1CsBn128(
   r1CsFilePath: string,
   commitWitnessCount: number,
   seed: number,
-  path: string,
+  pathPk: string,
+  pathVk: string,
 ): void
 export function setupFromCircomR1CsBls12381(
   r1CsFilePath: string,
   commitWitnessCount: number,
   seed: number,
-  path: string,
+  pathPk: string,
+  pathVk: string,
 ): void
 export function proveRangeBn128(
   r1CsFilePath: string,
-  keyFilePath: string,
+  pkFilePath: string,
   wasmFilePath: string,
+  proofFilePath: string,
   inputString: string,
   seed: number,
+): void
+export function proveRangeBls12381(
+  r1CsFilePath: string,
+  pkFilePath: string,
+  wasmFilePath: string,
+  proofFilePath: string,
+  inputString: string,
+  seed: number,
+): void
+export function verifyRangeBn128(
+  vkPath: string, 
+  proofFilePath: string
 ): void

@@ -5,7 +5,7 @@ use ark_serialize::{
 };
 use legogroth16::{ProvingKey};
 use std::{
-    fs::{write, read, File},
+    fs::{write, read},
     io::Result,
     path::PathBuf,
 };
@@ -27,28 +27,39 @@ pub fn read_bls12_381_proving_key_from_file (
 
 pub fn write_bn128_proving_key(
     proving_key : ProvingKey<Bn254>,
-    path : &str
+    pk_path : &str,
+    vk_path : &str
 ) -> Result<()> {
-    write_to_file_compresed_proving_key::<Bn254>(proving_key, path)
+    write_to_file_compresed_proving_key::<Bn254>(proving_key, pk_path,vk_path)
 }
 
 pub fn write_bls12_381_proving_key (
     proving_key : ProvingKey<Bls12_381>,
-    path : &str
+    pk_path : &str,
+    vk_path : &str
 ) -> Result<()> {
-    write_to_file_compresed_proving_key::<Bls12_381>(proving_key, path)
+    write_to_file_compresed_proving_key::<Bls12_381>(proving_key, pk_path, vk_path)
 }
 
 fn write_to_file_compresed_proving_key<E:Pairing>(
     proving_key : ProvingKey<E>,
-    path : &str
+    pk_path : &str,
+    vk_path : &str
 ) -> Result<()> {
     let mut compressed_bytes:Vec<u8> = Vec::new();
     proving_key.serialize_compressed(&mut compressed_bytes).unwrap();
     write(
-        abs_path(path),
-        compressed_bytes
+        abs_path(pk_path),
+        &compressed_bytes
     ).unwrap();
+
+    compressed_bytes.clear();
+    proving_key.vk.serialize_compressed(&mut compressed_bytes).unwrap();
+    write(
+        abs_path(vk_path),
+        &compressed_bytes
+    ).unwrap();
+
     Ok(())
 }
 

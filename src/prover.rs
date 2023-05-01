@@ -1,5 +1,4 @@
 use ark_ec::{pairing::Pairing, AffineRepr};
-use ark_relations::r1cs::{ConstraintSystem};
 use ark_std::{rand::{
     prelude::StdRng,
     SeedableRng},
@@ -7,7 +6,6 @@ use ark_std::{rand::{
 };
 use ark_serialize::{
     CanonicalSerialize, 
-    CanonicalDeserialize  
 };
 use legogroth16::{
     ProvingKey,

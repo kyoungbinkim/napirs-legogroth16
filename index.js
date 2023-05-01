@@ -234,9 +234,18 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { plus100, setupFromCircomR1CsBn128, setupFromCircomR1CsBls12381, proveRangeBn128 } = nativeBinding
+const {
+  plus100,
+  setupFromCircomR1CsBn128,
+  setupFromCircomR1CsBls12381,
+  proveRangeBn128,
+  proveRangeBls12381,
+  verifyRangeBn128,
+} = nativeBinding
 
 module.exports.plus100 = plus100
 module.exports.setupFromCircomR1CsBn128 = setupFromCircomR1CsBn128
 module.exports.setupFromCircomR1CsBls12381 = setupFromCircomR1CsBls12381
 module.exports.proveRangeBn128 = proveRangeBn128
+module.exports.proveRangeBls12381 = proveRangeBls12381
+module.exports.verifyRangeBn128 = verifyRangeBn128
