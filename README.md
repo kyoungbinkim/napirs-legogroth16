@@ -1,3 +1,16 @@
+# `napirs-legogroth16`
+
+to use legogroth16 in nodejs
+
+    yarn install  
+    yarn build --release
+
+test code 
+    
+    node simple-test.js
+    
+* * *
+
 # `@napi-rs/package-template`
 
 ![https://github.com/napi-rs/package-template/actions](https://github.com/napi-rs/package-template/workflows/CI/badge.svg)
