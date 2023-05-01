@@ -1,8 +1,8 @@
 const {
-  plus100,
   setupFromCircomR1CsBn128,
   proveRangeBn128,
-  verifyRangeBn128
+  verifyRangeBn128,
+  getProofBn128
 } = require('./index.js')
 
 
@@ -28,8 +28,6 @@ verifyRangeBn128(
     "./test_proof.bin"
 );
 
-console.assert(plus100(0) === 100, 'Simple test failed')
-
-
-
-console.info('Simple test passed')
+const proofString = getProofBn128("./test_proof.bin");
+console.log(proofString);
+console.log(JSON.parse(proofString));

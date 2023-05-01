@@ -71,8 +71,15 @@ pub fn read_compressed_proving_key_from_file<E:Pairing>(
     ProvingKey::<E>::deserialize_compressed(&*readed_proving_key_file).unwrap()
 }
 
+pub fn proving_key_to_strng<E:Pairing>(
+    proving_key : ProvingKey<E>
+) -> String {
+    format!("{:#?}", proving_key)
+}
+
 pub fn abs_path(relative_path: &str) -> String {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push(relative_path);
     path.to_string_lossy().to_string()
 }
+

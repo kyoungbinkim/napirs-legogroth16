@@ -241,6 +241,7 @@ const {
   proveRangeBn128,
   proveRangeBls12381,
   verifyRangeBn128,
+  getProofBn128,
 } = nativeBinding
 
 module.exports.plus100 = plus100
@@ -249,3 +250,4 @@ module.exports.setupFromCircomR1CsBls12381 = setupFromCircomR1CsBls12381
 module.exports.proveRangeBn128 = proveRangeBn128
 module.exports.proveRangeBls12381 = proveRangeBls12381
 module.exports.verifyRangeBn128 = verifyRangeBn128
+module.exports.getProofBn128 = getProofBn128

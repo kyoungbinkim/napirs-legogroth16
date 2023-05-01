@@ -6,15 +6,16 @@ use ark_std::{rand::{
 };
 use ark_serialize::{
     CanonicalSerialize, 
+    CanonicalDeserialize
 };
 use legogroth16::{
     ProvingKey,
     circom::{
         circuit::CircomCircuit,
         witness::WitnessCalculator
-    }, create_random_proof,
+    }, create_random_proof, Proof,
 };
-use std::fs::write;
+use std::{fs::{write, read}};
 
 use crate::keys::{read_compressed_proving_key_from_file, abs_path};
 
@@ -73,4 +74,24 @@ pub fn make_range_inputs<E:Pairing> (
     input_str = input_str.trim_start_matches("0x");
 
     E::ScalarField::from(u64::from_str_radix(input_str, 16).unwrap())
+}
+
+pub fn proof_to_string_from_file<E:Pairing> (
+    proof_file_path: &str
+) -> String {
+    let proof_bin = read(abs_path(proof_file_path)).unwrap();
+    let proof = Proof::<E>::deserialize_compressed(&*proof_bin).unwrap();
+    proof_to_string(proof)
+}
+
+pub fn proof_to_string<E:Pairing> (
+    proof : Proof<E>
+) -> String {
+    serde_json::json!({
+        "a" : format!("{:#?}", proof.a.into_group()),
+        "b" : format!("{:#?}", proof.b.into_group()),
+        "c" : format!("{:#?}", proof.c.into_group()),
+        "d" : format!("{:#?}", proof.d.into_group()),
+    }).to_string()
+    // format!("{:#?}", proof)
 }

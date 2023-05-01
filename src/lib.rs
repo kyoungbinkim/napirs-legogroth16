@@ -16,11 +16,6 @@ mod prover;
 
 mod verifier;
 
-#[napi]
-pub fn plus_100(input: u32) -> u32 {
-  input + 100
-}
-
 // path : pk, vk ans saving
 // pk   : circuit_bn128_pk.bin
 // vk   : circuit_bn128_vk.bin
@@ -118,5 +113,12 @@ pub fn verify_range_bn128(
     proof_file_path.as_str(), 
     vec![]
   );
+}
+
+#[napi]
+pub fn get_proof_bn128(
+  proof_file_path : String
+) -> String {
+  prover::proof_to_string_from_file::<Bn254>(proof_file_path.as_str())
 }
 

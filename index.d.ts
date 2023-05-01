@@ -34,7 +34,5 @@ export function proveRangeBls12381(
   inputString: string,
   seed: number,
 ): void
-export function verifyRangeBn128(
-  vkPath: string, 
-  proofFilePath: string
-): void
+export function verifyRangeBn128(vkPath: string, proofFilePath: string): void
+export function getProofBn128(proofFilePath: string): string
