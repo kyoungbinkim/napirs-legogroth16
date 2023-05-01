@@ -235,7 +235,6 @@ if (!nativeBinding) {
 }
 
 const {
-  plus100,
   setupFromCircomR1CsBn128,
   setupFromCircomR1CsBls12381,
   proveRangeBn128,
@@ -244,7 +243,6 @@ const {
   getProofBn128,
 } = nativeBinding
 
-module.exports.plus100 = plus100
 module.exports.setupFromCircomR1CsBn128 = setupFromCircomR1CsBn128
 module.exports.setupFromCircomR1CsBls12381 = setupFromCircomR1CsBls12381
 module.exports.proveRangeBn128 = proveRangeBn128

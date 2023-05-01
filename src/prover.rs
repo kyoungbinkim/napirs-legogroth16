@@ -1,4 +1,5 @@
-use ark_ec::{pairing::Pairing, AffineRepr};
+use ark_ec::{pairing::{Pairing}, AffineRepr, CurveGroup};
+use ark_ff::{BigInt, PrimeField};
 use ark_std::{rand::{
     prelude::StdRng,
     SeedableRng},
@@ -54,10 +55,12 @@ pub fn prove<
 
     let mut rng = StdRng::seed_from_u64(seed);
     let v = E::ScalarField::rand(&mut rng);
-
+    
     let proof = create_random_proof(circuit, v, &proving_key, &mut rng).unwrap();
     println!("committed wit : {:?}", committed_witnesses);
-    println!("proof.d : {}", proof.d.into_group());
+    println!("proof.d : {}", proof.d);
+    println!("calculated pedersen commitment: {}", proving_key.vk.gamma_abc_g1[1] * committed_witnesses[0] + &(proving_key.vk.eta_gamma_inv_g1.mul_bigint(v.into_bigint())));
+    println!("calculated pedersen commitment: {}", proving_key.vk.gamma_abc_g1[1] * committed_witnesses[0] + (proving_key.vk.eta_gamma_inv_g1.mul_bigint(v.into_bigint())));
 
     let mut compressed_bytes:Vec<u8> = Vec::new();
     proof.serialize_compressed(&mut compressed_bytes).unwrap();
@@ -87,11 +90,30 @@ pub fn proof_to_string_from_file<E:Pairing> (
 pub fn proof_to_string<E:Pairing> (
     proof : Proof<E>
 ) -> String {
+    // serde_json::json!({
+    //     "a" : format!("{:#?}", proof.a),
+    //     "b" : format!("{:#?}", proof.b),
+    //     "c" : format!("{:#?}", proof.c),
+    //     "d" : format!("{:#?}", proof.d),
+    // }).to_string();
     serde_json::json!({
-        "a" : format!("{:#?}", proof.a.into_group()),
-        "b" : format!("{:#?}", proof.b.into_group()),
-        "c" : format!("{:#?}", proof.c.into_group()),
-        "d" : format!("{:#?}", proof.d.into_group()),
+        "a" : format!("{:#?}", proof.a),
+        "b" : format!("{:#?}", proof.b),
+        "c" : format!("{:#?}", proof.c),
+        "d" : format!("{:#?}", proof.d),
     }).to_string()
-    // format!("{:#?}", proof)
+}
+
+pub fn add_pedersen_commitment_from_proof<E : Pairing>(
+    proof_one : Proof<E>,
+    proof_two : Proof<E>
+) -> E::G1Affine {
+    add_pedersen_commitment::<E>(proof_one.d.clone(), proof_two.d.clone())
+}
+
+pub fn add_pedersen_commitment<E : Pairing> (
+    commitment_one : E::G1Affine,
+    commitment_two : E::G1Affine
+) -> E::G1Affine {
+    (commitment_one +commitment_two).into()
 }

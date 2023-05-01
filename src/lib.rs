@@ -29,7 +29,7 @@ pub fn setup_from_circom_r1cs_bn128(
   path_pk : String,
   path_vk : String,
 ) {
-  let(_, proving_key) = setup::setup_from_circom_r1cs_bn128(
+  let(_, proving_key, _) = setup::setup_from_circom_r1cs_bn128(
     r1cs_file_path,
     commit_witness_count as usize,
     seed as u64
@@ -46,7 +46,7 @@ pub fn setup_from_circom_r1cs_bls12_381(
   path_pk : String,
   path_vk : String,
 ) {
-  let(_, proving_key) = setup::setup_from_circom_r1cs_bls12_381(
+  let(_, proving_key, _) = setup::setup_from_circom_r1cs_bls12_381(
     r1cs_file_path,
     commit_witness_count as usize,
     seed as u64
@@ -65,7 +65,7 @@ pub fn prove_range_bn128(
   seed : u32
 ) {
   let value = prover::make_range_inputs::<Bn254>(input_string);
-  let mut inputs= HashMap ::new();
+  let mut inputs= HashMap::new();
   inputs.insert("value".to_string(), vec![value]);
 
   prover::prove::<Bn254, _>(
