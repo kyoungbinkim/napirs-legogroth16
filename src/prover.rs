@@ -1,5 +1,5 @@
-use ark_ec::{pairing::{Pairing}, AffineRepr, CurveGroup};
-use ark_ff::{BigInt, PrimeField};
+use ark_ec::{pairing::{Pairing}, AffineRepr};
+use ark_ff::{PrimeField};
 use ark_std::{rand::{
     prelude::StdRng,
     SeedableRng},
@@ -79,6 +79,12 @@ pub fn make_range_inputs<E:Pairing> (
     E::ScalarField::from(u64::from_str_radix(input_str, 16).unwrap())
 }
 
+pub fn hex_string_to_scalar_field<E:Pairing> (
+    hex_string: String
+) -> E::ScalarField {
+    make_range_inputs::<E>(hex_string).into()
+}
+
 pub fn proof_to_string_from_file<E:Pairing> (
     proof_file_path: &str
 ) -> String {
@@ -104,6 +110,52 @@ pub fn proof_to_string<E:Pairing> (
     }).to_string()
 }
 
+// to calculate g*m + h*v, originally m and g are vector
+// m : message
+// v : random
+// g : proving_key.vk.gamma_abc_g1
+// h : proving_key.vk.eta_gamma_inv_g1
+pub fn calculate_pedersen_commitment<E:Pairing>(
+    proving_key : ProvingKey<E>,
+    m : E::ScalarField,
+    v : E::ScalarField
+) -> E::G1Affine {
+    (proving_key.vk.gamma_abc_g1[1] * m + proving_key.vk.eta_gamma_inv_g1 * v).into()
+}
+
+pub fn aggregate_proof_commitment<E:Pairing>(
+    proof_file_paths : Vec<String>,
+    save_file_path : &str
+) {
+    assert!(proof_file_paths.len() == 0);
+    let mut result = Proof::<E>::deserialize_compressed(
+        &*read(abs_path(&proof_file_paths[0])).unwrap()
+    ).unwrap().d;
+
+    for proof_file_path in proof_file_paths.iter().skip(1) {
+        let proof = Proof::<E>::deserialize_compressed(
+            &*read(abs_path(proof_file_path)).unwrap()
+        ).unwrap().d;
+        result = add_pedersen_commitment::<E>(result, proof);
+    }
+    
+    let mut compressed_bytes:Vec<u8> = Vec::new();
+    result.serialize_compressed(&mut compressed_bytes).unwrap();
+    write(
+        abs_path(save_file_path),
+        compressed_bytes
+    ).unwrap();
+}
+
+pub fn add_pedersen_commitment_from_proof_file<E:Pairing>(
+    proof_one_file_path:&str,
+    proof_two_file_path:&str,
+) -> E::G1Affine {
+    let proof_one: Proof<E> = Proof::<E>::deserialize_compressed(&*read(proof_one_file_path).unwrap()).unwrap();
+    let proof_two: Proof<E> = Proof::<E>::deserialize_compressed(&*read(proof_two_file_path).unwrap()).unwrap();
+    add_pedersen_commitment_from_proof(proof_one, proof_two)
+}
+
 pub fn add_pedersen_commitment_from_proof<E : Pairing>(
     proof_one : Proof<E>,
     proof_two : Proof<E>
@@ -115,5 +167,13 @@ pub fn add_pedersen_commitment<E : Pairing> (
     commitment_one : E::G1Affine,
     commitment_two : E::G1Affine
 ) -> E::G1Affine {
-    (commitment_one +commitment_two).into()
+    (commitment_one + commitment_two).into()
 }
+
+pub fn add_pedersen_commitment_and_proof<E:Pairing>(
+    proof : Proof<E>,
+    commitment : E::G1Affine
+) -> E::G1Affine {
+    add_pedersen_commitment::<E>(proof.d, commitment)
+}
+

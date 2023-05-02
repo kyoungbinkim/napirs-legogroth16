@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 #![allow(dead_code)]
+#![warn(non_snake_case)]
 
 use std::collections::HashMap;
 
@@ -122,3 +123,33 @@ pub fn get_proof_bn128(
   prover::proof_to_string_from_file::<Bn254>(proof_file_path.as_str())
 }
 
+#[napi] 
+pub fn aggregate_proof_commitment_bn128(
+  proof_file_paths : Vec<String>,
+  save_file_path : String
+){
+  prover::aggregate_proof_commitment::<Bn254>(proof_file_paths, &save_file_path.as_str());
+}
+
+#[napi]
+pub fn aggregate_proof_commitment_bls12_381(
+  proof_file_paths : Vec<String>,
+  save_file_path : String
+){
+  prover::aggregate_proof_commitment::<Bls12_381>(proof_file_paths, &save_file_path.as_str());
+}
+
+
+#[napi]
+pub fn calculate_pedersen_commitment_bn128(
+  proving_file_path: String,
+  m : String,
+  v : String
+) -> String {
+  let proving_key = keys::read_compressed_proving_key_from_file::<Bn254>(&proving_file_path.as_str());
+  let m = prover::hex_string_to_scalar_field::<Bn254>(m);
+  let v = prover::hex_string_to_scalar_field::<Bn254>(v);
+
+  let commitment = prover::calculate_pedersen_commitment::<Bn254>(proving_key, m, v);
+  format!("{:#?}", commitment)
+}
