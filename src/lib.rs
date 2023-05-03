@@ -1,11 +1,14 @@
 #![deny(clippy::all)]
 #![allow(dead_code)]
-#![warn(non_snake_case)]
 
 use std::collections::HashMap;
 
 use ark_bn254::Bn254;
 use ark_bls12_381::Bls12_381;
+use std::{
+  fs::{write, read},
+  str::from_utf8
+};
 
 use napi_derive::napi;
 
@@ -21,7 +24,6 @@ mod verifier;
 // pk   : circuit_bn128_pk.bin
 // vk   : circuit_bn128_vk.bin
 // proof: circuit_bn128_proof.bin
-
 #[napi]
 pub fn setup_from_circom_r1cs_bn128(
   r1cs_file_path : String,
@@ -59,8 +61,8 @@ pub fn setup_from_circom_r1cs_bls12_381(
 #[napi]
 pub fn prove_range_bn128(
   r1cs_file_path : String,
-  pk_file_path : String,
   wasm_file_path : String,
+  pk_file_path : String,
   proof_file_path : String,
   input_string: String,
   seed : u32
@@ -69,7 +71,7 @@ pub fn prove_range_bn128(
   let mut inputs= HashMap::new();
   inputs.insert("value".to_string(), vec![value]);
 
-  prover::prove::<Bn254, _>(
+  let opening_key = prover::prove::<Bn254, _>(
     r1cs_file_path.as_str(), 
     pk_file_path.as_str(), 
     wasm_file_path.as_str(), 
@@ -78,13 +80,27 @@ pub fn prove_range_bn128(
     inputs.clone(), 
     seed as u64
   );
+  println!("opening_key: {}", opening_key);
+  let opening_key_path = format!("{}{}",proof_file_path.as_str().trim_end_matches(".bin"), "_opening_key.json");
+  println!("opening_key_path : {}", opening_key_path);
+
+  write(
+    keys::abs_path(opening_key_path.as_str()),
+    opening_key.as_bytes()
+  ).unwrap();
+
+  let read_o = read(
+    keys::abs_path(opening_key_path.as_str())
+  ).unwrap();
+
+  println!("read_o : {:?}", from_utf8(&read_o));
 }
 
 #[napi]
 pub fn prove_range_bls12_381(
   r1cs_file_path : String,
-  pk_file_path : String,
   wasm_file_path : String,
+  pk_file_path : String,
   proof_file_path : String,
   input_string: String,
   seed : u32
@@ -93,7 +109,7 @@ pub fn prove_range_bls12_381(
   let mut inputs= HashMap ::new();
   inputs.insert("value".to_string(), vec![value]);
 
-  prover::prove::<Bls12_381, _>(
+  let opening_key = prover::prove::<Bls12_381, _>(
     r1cs_file_path.as_str(), 
     pk_file_path.as_str(), 
     wasm_file_path.as_str(), 
@@ -102,6 +118,9 @@ pub fn prove_range_bls12_381(
     inputs.clone(), 
     seed as u64
   );
+  println!("opening_key: {}", opening_key);
+  let opening_key_path = format!("{}{}",proof_file_path.as_str().trim_end_matches(".bin"), "_opening_key.bin");
+  println!("opening_key_path : {}", opening_key_path);
 }
 
 #[napi]
@@ -139,6 +158,21 @@ pub fn aggregate_proof_commitment_bls12_381(
   prover::aggregate_proof_commitment::<Bls12_381>(proof_file_paths, &save_file_path.as_str());
 }
 
+#[napi]
+pub fn aggregate_opening_keys_bn128(
+  opening_key_file_paths : Vec<String>,
+  save_file_path : String
+){
+  prover::aggregated_pedersen_commitment_opening_keys::<Bn254>(opening_key_file_paths, &save_file_path.as_str());
+}
+
+#[napi]
+pub fn aggregate_opening_keys_bls12_381(
+  opening_key_file_paths : Vec<String>,
+  save_file_path : String
+){
+  prover::aggregated_pedersen_commitment_opening_keys::<Bls12_381>(opening_key_file_paths, &save_file_path.as_str());
+}
 
 #[napi]
 pub fn calculate_pedersen_commitment_bn128(
@@ -149,6 +183,8 @@ pub fn calculate_pedersen_commitment_bn128(
   let proving_key = keys::read_compressed_proving_key_from_file::<Bn254>(&proving_file_path.as_str());
   let m = prover::hex_string_to_scalar_field::<Bn254>(m);
   let v = prover::hex_string_to_scalar_field::<Bn254>(v);
+
+  // println!("calculate_pedersen_commitment_bn128 m : {}", m.into_string());
 
   let commitment = prover::calculate_pedersen_commitment::<Bn254>(proving_key, m, v);
   format!("{:#?}", commitment)

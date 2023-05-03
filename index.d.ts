@@ -19,16 +19,16 @@ export function setupFromCircomR1CsBls12381(
 ): void
 export function proveRangeBn128(
   r1CsFilePath: string,
-  pkFilePath: string,
   wasmFilePath: string,
+  pkFilePath: string,
   proofFilePath: string,
   inputString: string,
   seed: number,
 ): void
 export function proveRangeBls12381(
   r1CsFilePath: string,
-  pkFilePath: string,
   wasmFilePath: string,
+  pkFilePath: string,
   proofFilePath: string,
   inputString: string,
   seed: number,
@@ -37,4 +37,6 @@ export function verifyRangeBn128(vkPath: string, proofFilePath: string): void
 export function getProofBn128(proofFilePath: string): string
 export function aggregateProofCommitmentBn128(proofFilePaths: Array<string>, saveFilePath: string): void
 export function aggregateProofCommitmentBls12381(proofFilePaths: Array<string>, saveFilePath: string): void
+export function aggregateOpeningKeysBn128(openingKeyFilePaths: Array<string>, saveFilePath: string): void
+export function aggregateOpeningKeysBls12381(openingKeyFilePaths: Array<string>, saveFilePath: string): void
 export function calculatePedersenCommitmentBn128(provingFilePath: string, m: string, v: string): string

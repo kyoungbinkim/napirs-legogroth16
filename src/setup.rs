@@ -27,7 +27,8 @@ pub fn gen_params<E: Pairing>(
         g2,
     };
 
-    println!("link gen : {:?}", link_gens);
+    // to debug
+    // println!("link gen : {:?}", link_gens);
 
     let params_link = generate_random_parameters_incl_cp_link(
         circuit.clone(), 
