@@ -25,7 +25,10 @@ use legogroth16::{
 use std::{
     fs::{write, read}
 };
-use hex;
+// use num::big;
+// use num_bigint::BigUint;
+use hex::{ToHex};
+
 
 use crate::keys::{read_compressed_proving_key_from_file, abs_path};
 
@@ -66,9 +69,11 @@ pub fn prove<
     let v: <E as Pairing>::ScalarField = E::ScalarField::rand(&mut rng);
     
     let proof = create_random_proof(circuit, v, &proving_key, &mut rng).unwrap();
-    println!("committed wit : {:?}", committed_witnesses);
-    println!("proof.d : {}", proof.d);
-    println!("calculated pedersen commitment: {}", proving_key.vk.gamma_abc_g1[1] * committed_witnesses[0] + &(proving_key.vk.eta_gamma_inv_g1.mul_bigint(v.into_bigint())));
+    
+    // to debug
+    // println!("committed wit : {:?}", committed_witnesses);
+    // println!("proof.d : {}", proof.d);
+    // println!("calculated pedersen commitment: {}", proving_key.vk.gamma_abc_g1[1] * committed_witnesses[0] + &(proving_key.vk.eta_gamma_inv_g1.mul_bigint(v.into_bigint())));
     // println!("calculated pedersen commitment: {}", proving_key.vk.gamma_abc_g1[1] * committed_witnesses[0] + (proving_key.vk.eta_gamma_inv_g1.mul_bigint(v.into_bigint())));
     println!("v : {:?}", v.to_string());
 
@@ -79,9 +84,16 @@ pub fn prove<
         compressed_bytes
     ).unwrap();
 
+    // println!("test to_bytes_le : {:?}", v.into_bigint().to_bytes_le());
+    // println!("test to_bytes_be : {:?}", v.into_bigint().to_bytes_be());
+    // println!("test from bytes_be : {:?}", E::ScalarField::from_be_bytes_mod_order(&v.into_bigint().to_bytes_be()).to_string());
+    // println!("test to hex string : {}", v.into_bigint().to_bytes_be().encode_hex::<String>());
+
+    // println!("test commited : {}", committed_witnesses[0].into_bigint());
+
     serde_json::to_string(&serde_json::json!({
-        "m" : committed_witnesses[0].to_string(),
-        "v" : v.to_string()
+        "m" : committed_witnesses[0].into_bigint().to_bytes_be().encode_hex::<String>(),
+        "v" : v.into_bigint().to_bytes_be().encode_hex::<String>()
     })).unwrap()
 }
 
@@ -225,6 +237,8 @@ pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
     println!("dec_string_to_scalar_field : {}", dec_string_to_scalar_field::<E>(
         opening_key_json["m"].as_str().unwrap().to_string()
     ));
+
+    println!("{:?}", opening_key_json["m"].as_str().unwrap());
 
     let mut aggregated_v = hex_string_to_scalar_field::<E>(
         opening_key_json["v"].as_str().unwrap().to_string()
