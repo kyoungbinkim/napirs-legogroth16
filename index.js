@@ -243,6 +243,8 @@ const {
   getProofBn128,
   aggregateProofCommitmentBn128,
   aggregateProofCommitmentBls12381,
+  getAggregatedCommitmentBn128,
+  getAggregatedCommitmentBls12381,
   aggregateOpeningKeysBn128,
   aggregateOpeningKeysBls12381,
   calculatePedersenCommitmentBn128,
@@ -256,6 +258,8 @@ module.exports.verifyRangeBn128 = verifyRangeBn128
 module.exports.getProofBn128 = getProofBn128
 module.exports.aggregateProofCommitmentBn128 = aggregateProofCommitmentBn128
 module.exports.aggregateProofCommitmentBls12381 = aggregateProofCommitmentBls12381
+module.exports.getAggregatedCommitmentBn128 = getAggregatedCommitmentBn128
+module.exports.getAggregatedCommitmentBls12381 = getAggregatedCommitmentBls12381
 module.exports.aggregateOpeningKeysBn128 = aggregateOpeningKeysBn128
 module.exports.aggregateOpeningKeysBls12381 = aggregateOpeningKeysBls12381
 module.exports.calculatePedersenCommitmentBn128 = calculatePedersenCommitmentBn128

@@ -37,6 +37,8 @@ export function verifyRangeBn128(vkPath: string, proofFilePath: string): void
 export function getProofBn128(proofFilePath: string): string
 export function aggregateProofCommitmentBn128(proofFilePaths: Array<string>, saveFilePath: string): void
 export function aggregateProofCommitmentBls12381(proofFilePaths: Array<string>, saveFilePath: string): void
+export function getAggregatedCommitmentBn128(aggregatedCommitmentFilePath: string): string
+export function getAggregatedCommitmentBls12381(aggregatedCommitmentFilePath: string): string
 export function aggregateOpeningKeysBn128(openingKeyFilePaths: Array<string>, saveFilePath: string): void
 export function aggregateOpeningKeysBls12381(openingKeyFilePaths: Array<string>, saveFilePath: string): void
 export function calculatePedersenCommitmentBn128(provingFilePath: string, m: string, v: string): string

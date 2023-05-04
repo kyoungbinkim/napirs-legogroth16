@@ -1,5 +1,5 @@
-use ark_ec::{pairing::{Pairing}, AffineRepr};
-use ark_ff::{PrimeField,BigInteger ,BigInteger256, BigInt};
+use ark_ec::{pairing::{Pairing}};
+use ark_ff::{PrimeField,BigInteger };
 use ark_std::{
     rand::
     {
@@ -7,9 +7,6 @@ use ark_std::{
         SeedableRng
     },
     UniformRand,
-    str::{
-        FromStr
-    }
 };
 use ark_serialize::{
     CanonicalSerialize, 
@@ -25,8 +22,6 @@ use legogroth16::{
 use std::{
     fs::{write, read}
 };
-// use num::big;
-// use num_bigint::BigUint;
 use hex::{ToHex};
 
 
@@ -84,11 +79,11 @@ pub fn prove<
         compressed_bytes
     ).unwrap();
 
+    // to debug
     // println!("test to_bytes_le : {:?}", v.into_bigint().to_bytes_le());
     // println!("test to_bytes_be : {:?}", v.into_bigint().to_bytes_be());
     // println!("test from bytes_be : {:?}", E::ScalarField::from_be_bytes_mod_order(&v.into_bigint().to_bytes_be()).to_string());
-    // println!("test to hex string : {}", v.into_bigint().to_bytes_be().encode_hex::<String>());
-
+    // println!("test to hex string : {}", v.into_bigint().to_bytes_be().encode_hex::<String>());åå
     // println!("test commited : {}", committed_witnesses[0].into_bigint());
 
     serde_json::to_string(&serde_json::json!({
@@ -113,35 +108,9 @@ pub fn hex_string_to_scalar_field<E:Pairing> (
     hex_string = hex_string.trim_start_matches("0x");
     let bytes = hex::decode(format!("{:0>64}", hex_string)).unwrap();
 
-    // let bits_le: Vec<bool> = bytes
-    //     .iter()
-    //     .flat_map(|byte| (0..8).rev().map(move |i| (*byte >> i) & 1 == 1))
-    //     .collect();
-
     E::ScalarField::from_be_bytes_mod_order(
         &bytes
     )
-}
-
-pub fn dec_string_to_scalar_field<E:Pairing> (
-    dec_sting: String
-) -> E::ScalarField {
-    // E::ScalarField::from_be_bytes_mod_order(
-    //     &decimal_string_to_bytes(dec_sting.as_str())
-    // )
-    println!("decimal_string_to_bytes: {:?}", decimal_string_to_bytes(dec_sting.as_str()));
-    E::ScalarField::from_le_bytes_mod_order(
-        &decimal_string_to_bytes(dec_sting.as_str())
-    )
-}
-
-
-// 문제 ~~~
-fn decimal_string_to_bytes(decimal_string: &str) -> Vec<u8> {
-    decimal_string
-        .chars()
-        .map(|c| (c as u8) - b'0')
-        .collect()
 }
 
 pub fn proof_to_string_from_file<E:Pairing> (
@@ -191,7 +160,6 @@ pub fn aggregate_proof_commitment<E:Pairing>(
     save_file_path : &str
 ) {
     println!("==== aggregate_proof_commitment ====");
-    println!("proof_file_paths : {:?}", proof_file_paths);
 
     assert!(proof_file_paths.len() != 0);
     let mut result = Proof::<E>::deserialize_compressed(
@@ -213,15 +181,20 @@ pub fn aggregate_proof_commitment<E:Pairing>(
     ).unwrap();
 }
 
+pub fn get_aggregated_commitment<E:Pairing>(
+    aggregated_commitment_file_path : &str
+) -> String {
+    let aggregated_commitment_bin = read(abs_path(aggregated_commitment_file_path)).unwrap();
+    let aggregated_commitment = E::G1Affine::deserialize_compressed(&*aggregated_commitment_bin).unwrap();
+    format!("{:#?}", aggregated_commitment)
+}
+
 // save as json
 pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
     opening_key_paths : Vec<String>,
     save_file_path : &str
 ) {
     assert!(opening_key_paths.len() != 0);
-    // let mut tmp = Proof::<E>::deserialize_compressed(
-    //     &*read(abs_path(&opening_key_paths[0])).unwrap()
-    // ).unwrap();
     
     let opening_key_json : serde_json::Value = serde_json::from_str(
         std::str::from_utf8(
@@ -231,14 +204,6 @@ pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
     println!("{}", std::str::from_utf8(
         &(read(abs_path(&opening_key_paths[0])).unwrap())
     ).unwrap());
-    println!("opening_key_json : {}", opening_key_json);
-    println!("m : {}", opening_key_json["m"]);
-    
-    println!("dec_string_to_scalar_field : {}", dec_string_to_scalar_field::<E>(
-        opening_key_json["m"].as_str().unwrap().to_string()
-    ));
-
-    println!("{:?}", opening_key_json["m"].as_str().unwrap());
 
     let mut aggregated_v = hex_string_to_scalar_field::<E>(
         opening_key_json["v"].as_str().unwrap().to_string()
@@ -246,10 +211,6 @@ pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
     let mut aggregated_m = hex_string_to_scalar_field::<E>(
         opening_key_json["m"].as_str().unwrap().to_string()
     );
-    println!("aggregated_v : {}", aggregated_v);
-    println!("aggregated_m : {}", aggregated_m);
-
-
 
     for opening_key_path in opening_key_paths.iter().skip(1) {
         let opening_key_json : serde_json::Value = serde_json::from_str(
@@ -263,13 +224,23 @@ pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
         let m = hex_string_to_scalar_field::<E>(
             opening_key_json["m"].as_str().unwrap().to_string()
         );
-        println!("v : {}", v);
-        println!("m : {}", m);
+
         aggregated_v = aggregated_v + v;
         aggregated_m = aggregated_m + m;
     }
-    
-    
+
+    println!("aggregated_v : {}", aggregated_v);
+    println!("aggregated_m : {}", aggregated_m);
+
+    let aggregated_opening_key =  serde_json::to_string(&serde_json::json!({
+        "m" : aggregated_m.into_bigint().to_bytes_be().encode_hex::<String>(),
+        "v" : aggregated_v.into_bigint().to_bytes_be().encode_hex::<String>()
+    })).unwrap();
+
+    write(
+        save_file_path, 
+        aggregated_opening_key
+    ).unwrap();
 }
 
 pub fn add_pedersen_commitment_from_proof_file<E:Pairing>(

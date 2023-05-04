@@ -6,8 +6,7 @@ use std::collections::HashMap;
 use ark_bn254::Bn254;
 use ark_bls12_381::Bls12_381;
 use std::{
-  fs::{write, read},
-  str::from_utf8
+  fs::{write}
 };
 
 use napi_derive::napi;
@@ -80,20 +79,12 @@ pub fn prove_range_bn128(
     inputs.clone(), 
     seed as u64
   );
-  println!("opening_key: {}", opening_key);
   let opening_key_path = format!("{}{}",proof_file_path.as_str().trim_end_matches(".bin"), "_opening_key.json");
-  println!("opening_key_path : {}", opening_key_path);
 
   write(
     keys::abs_path(opening_key_path.as_str()),
     opening_key.as_bytes()
   ).unwrap();
-
-  let read_o = read(
-    keys::abs_path(opening_key_path.as_str())
-  ).unwrap();
-
-  println!("read_o : {:?}", from_utf8(&read_o));
 }
 
 #[napi]
@@ -159,6 +150,20 @@ pub fn aggregate_proof_commitment_bls12_381(
 }
 
 #[napi]
+pub fn get_aggregated_commitment_bn128(
+  aggregated_commitment_file_path : String
+) -> String {
+  prover::get_aggregated_commitment::<Bn254>(aggregated_commitment_file_path.as_str())
+}
+
+#[napi]
+pub fn get_aggregated_commitment_bls12_381(
+  aggregated_commitment_file_path : String
+) -> String {
+  prover::get_aggregated_commitment::<Bls12_381>(aggregated_commitment_file_path.as_str())
+}
+
+#[napi]
 pub fn aggregate_opening_keys_bn128(
   opening_key_file_paths : Vec<String>,
   save_file_path : String
@@ -183,8 +188,6 @@ pub fn calculate_pedersen_commitment_bn128(
   let proving_key = keys::read_compressed_proving_key_from_file::<Bn254>(&proving_file_path.as_str());
   let m = prover::hex_string_to_scalar_field::<Bn254>(m);
   let v = prover::hex_string_to_scalar_field::<Bn254>(v);
-
-  // println!("calculate_pedersen_commitment_bn128 m : {}", m.into_string());
 
   let commitment = prover::calculate_pedersen_commitment::<Bn254>(proving_key, m, v);
   format!("{:#?}", commitment)

@@ -4,6 +4,7 @@ const {
   verifyRangeBn128,
   getProofBn128,
   aggregateProofCommitmentBn128,
+  getAggregatedCommitmentBn128,
   aggregateOpeningKeysBn128,
   calculatePedersenCommitmentBn128
 } = require('./index.js')
@@ -23,7 +24,7 @@ proveRangeBn128(
     "./circom/bn128/range_proof.wasm",
     "./range_pk.bin",
     "./test_proof1.bin",
-    "0xffffa",
+    "0xfffffffffffffff0",
     1223
 );
 
@@ -46,12 +47,11 @@ console.log(proofString);
 console.log(JSON.parse(proofString));
 
 const test1Json = JSON.parse(fs.readFileSync("./test_proof1_opening_key.json"));
-console.log(BigInt(test1Json["m"]).toString(16));
 console.log(
     calculatePedersenCommitmentBn128(
         "./range_pk.bin", 
-        BigInt(test1Json["m"]).toString(16), 
-        BigInt(test1Json["v"]).toString(16)
+        test1Json["m"], 
+        test1Json["v"]
     )
 );
 
@@ -70,4 +70,21 @@ aggregateOpeningKeysBn128(
         "./test_proof2_opening_key.json"
     ],
     "./aggregated_opening_key.json"
+)
+
+const aggregatedOpeningKeyJson = JSON.parse(fs.readFileSync("./aggregated_opening_key.json"));
+console.log(
+    "calculated aggregated commitment:",
+    calculatePedersenCommitmentBn128(
+        "./range_pk.bin", 
+        aggregatedOpeningKeyJson["m"], 
+        aggregatedOpeningKeyJson["v"]
+    )
+);
+
+console.log(
+    "from aggregated proof :",
+    getAggregatedCommitmentBn128(
+        "./aggregated_proof.bin"
+    )
 )
