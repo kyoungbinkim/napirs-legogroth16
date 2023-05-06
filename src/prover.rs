@@ -1,4 +1,4 @@
-use ark_ec::{pairing::{Pairing}};
+use ark_ec::{pairing::{Pairing}, AffineRepr};
 use ark_ff::{PrimeField,BigInteger };
 use ark_std::{
     rand::
@@ -20,9 +20,10 @@ use legogroth16::{
     }, create_random_proof, Proof,
 };
 use std::{
-    fs::{write, read}
+    fs::{write, read},
+    collections::HashMap,
 };
-use hex::{ToHex};
+use hex::ToHex;
 
 
 use crate::keys::{read_compressed_proving_key_from_file, abs_path};
@@ -240,6 +241,104 @@ pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
     write(
         save_file_path, 
         aggregated_opening_key
+    ).unwrap();
+}
+
+// 너무 코드가 드러움....... 고치기는 귀찮아 ..................
+// proof file path : updated user proof 
+// aggregated_commitment_file_path : aggregated commitment
+pub fn update_aggregated_commitment<E:Pairing>(
+    r1cs_file_path : &str,
+    key_file_path : &str,
+    wasm_file_path : &str,
+    proof_file_path : &str,
+    aggregated_commitment_file_path : &str,
+    aggregated_opening_key_file_path : &str,
+    update_value : String,
+    seed : u64
+) {
+    let opening_key_path = format!("{}{}",proof_file_path.trim_end_matches(".bin"), "_opening_key.json");
+    let opening_key_json : serde_json::Value = serde_json::from_str(
+        std::str::from_utf8(
+            &(read(abs_path(&opening_key_path)).unwrap())
+        ).unwrap()
+    ).unwrap();
+
+    let aggregated_opening_key_json : serde_json::Value = serde_json::from_str(
+        std::str::from_utf8(
+            &(read(abs_path(&aggregated_opening_key_file_path)).unwrap())
+        ).unwrap()
+    ).unwrap();
+
+    let before_v = hex_string_to_scalar_field::<E>(
+        opening_key_json["v"].as_str().unwrap().to_string()
+    );
+    let before_m = hex_string_to_scalar_field::<E>(
+        opening_key_json["m"].as_str().unwrap().to_string()
+    );
+    let mut aggregated_v = hex_string_to_scalar_field::<E>(
+        aggregated_opening_key_json["v"].as_str().unwrap().to_string()
+    );
+    let mut aggregated_m = hex_string_to_scalar_field::<E>(
+        aggregated_opening_key_json["m"].as_str().unwrap().to_string()
+    );
+
+    // sub before opening keys
+    aggregated_m = aggregated_m - before_m;
+    aggregated_v = aggregated_v - before_v;
+
+    let aggregated_commitment_bin = read(abs_path(aggregated_commitment_file_path)).unwrap();
+    let mut aggregated_commitment = E::G1Affine::deserialize_compressed(&*aggregated_commitment_bin).unwrap();
+
+    let mut proof_bin = read(abs_path(proof_file_path)).unwrap();
+    let mut proof: Proof<E> = Proof::<E>::deserialize_compressed(&*proof_bin).unwrap();
+
+    // aggregated commitment - update_proof_d
+    aggregated_commitment = (aggregated_commitment.into_group() - proof.d.into_group()).into();
+    
+    let inputs_value = make_range_inputs::<E>(update_value);
+    let mut inputs= HashMap ::new();
+    inputs.insert("value".to_string(), vec![inputs_value]);
+    let after_opening_key = prove::<E, _>(
+        r1cs_file_path, 
+        key_file_path, 
+        wasm_file_path, 
+        proof_file_path, 
+        1, 
+        inputs, 
+        seed
+    );
+    proof_bin = read(abs_path(proof_file_path)).unwrap();
+    proof = Proof::<E>::deserialize_compressed(&*proof_bin).unwrap();
+
+    let after_opening_key_json : serde_json::Value = serde_json::from_str(&after_opening_key).unwrap();
+    let after_v = hex_string_to_scalar_field::<E>(
+        after_opening_key_json["v"].as_str().unwrap().to_string()
+    );
+    let after_m = hex_string_to_scalar_field::<E>(
+        after_opening_key_json["m"].as_str().unwrap().to_string()
+    );
+
+    aggregated_v = aggregated_v + after_v;
+    aggregated_m = aggregated_m + after_m;
+
+    aggregated_commitment = (aggregated_commitment + proof.d).into();
+
+    let aggregated_opening_key =  serde_json::to_string(&serde_json::json!({
+        "m" : aggregated_m.into_bigint().to_bytes_be().encode_hex::<String>(),
+        "v" : aggregated_v.into_bigint().to_bytes_be().encode_hex::<String>()
+    })).unwrap();
+
+    write(
+        aggregated_opening_key_file_path, 
+        aggregated_opening_key
+    ).unwrap();
+
+    let mut compressed_bytes:Vec<u8> = Vec::new();
+    aggregated_commitment.serialize_compressed(&mut compressed_bytes).unwrap();
+    write(
+        aggregated_commitment_file_path,
+        compressed_bytes
     ).unwrap();
 }
 

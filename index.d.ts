@@ -41,4 +41,15 @@ export function getAggregatedCommitmentBn128(aggregatedCommitmentFilePath: strin
 export function getAggregatedCommitmentBls12381(aggregatedCommitmentFilePath: string): string
 export function aggregateOpeningKeysBn128(openingKeyFilePaths: Array<string>, saveFilePath: string): void
 export function aggregateOpeningKeysBls12381(openingKeyFilePaths: Array<string>, saveFilePath: string): void
+export function updateAggregatedCommitmentBn128(
+  r1CsFilePath: string,
+  keyFilePath: string,
+  wasmFilePath: string,
+  proofFilePath: string,
+  aggregatedCommitmentFilePath: string,
+  aggregatedOpeningKeyFilePath: string,
+  updateValue: string,
+  seed: number,
+): void
+export function updateAggregatedCommitmentBls12381(): void
 export function calculatePedersenCommitmentBn128(provingFilePath: string, m: string, v: string): string

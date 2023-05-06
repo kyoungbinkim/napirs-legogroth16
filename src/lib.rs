@@ -180,6 +180,36 @@ pub fn aggregate_opening_keys_bls12_381(
 }
 
 #[napi]
+pub fn update_aggregated_commitment_bn128(
+  r1cs_file_path : String,
+  key_file_path : String,
+  wasm_file_path : String,
+  proof_file_path : String,
+  aggregated_commitment_file_path : String,
+  aggregated_opening_key_file_path : String,
+  update_value : String,
+  seed : u32
+){
+  prover::update_aggregated_commitment::<Bn254>(
+    r1cs_file_path.as_str(), 
+    key_file_path.as_str(), 
+    wasm_file_path.as_str(),
+    proof_file_path.as_str(), 
+    aggregated_commitment_file_path.as_str(), 
+    aggregated_opening_key_file_path.as_str(), 
+    update_value.clone(), 
+    seed as u64
+  );
+}
+
+#[napi]
+pub fn update_aggregated_commitment_bls12_381(
+
+){
+
+}
+
+#[napi]
 pub fn calculate_pedersen_commitment_bn128(
   proving_file_path: String,
   m : String,

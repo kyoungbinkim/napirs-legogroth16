@@ -6,7 +6,8 @@ const {
   aggregateProofCommitmentBn128,
   getAggregatedCommitmentBn128,
   aggregateOpeningKeysBn128,
-  calculatePedersenCommitmentBn128
+  calculatePedersenCommitmentBn128,
+  updateAggregatedCommitmentBn128
 } = require('./index.js')
 
 const fs = require('fs');
@@ -37,6 +38,15 @@ proveRangeBn128(
     1223
 );
 
+proveRangeBn128(
+    "./circom/bn128/range_proof.r1cs",
+    "./circom/bn128/range_proof.wasm",
+    "./range_pk.bin",
+    "./test_proof3.bin",
+    "0x00101000",
+    1223
+);
+
 verifyRangeBn128(
     "./range_vk.bin",
     "./test_proof1.bin"
@@ -58,16 +68,18 @@ console.log(
 aggregateProofCommitmentBn128(
     [
         "./test_proof1.bin",
-        "./test_proof2.bin"
+        "./test_proof2.bin",
+        "./test_proof3.bin"
     ],
-    "./aggregated_proof.bin"
+    "./aggregated_commitment.bin"
 )
 
 
 aggregateOpeningKeysBn128(
     [
         "./test_proof1_opening_key.json",
-        "./test_proof2_opening_key.json"
+        "./test_proof2_opening_key.json",
+        "./test_proof3_opening_key.json"
     ],
     "./aggregated_opening_key.json"
 )
@@ -85,6 +97,16 @@ console.log(
 console.log(
     "from aggregated proof :",
     getAggregatedCommitmentBn128(
-        "./aggregated_proof.bin"
+        "./aggregated_commitmen😭t.bin"
     )
+)
+
+// TODO : 테스트 해보기😭
+updateAggregatedCommitmentBn128(
+    "./circom/bn128/range_proof.r1cs",
+    "./circom/bn128/range_proof.wasm",
+    "./range_pk.bin",
+    "./test_proof3.bin",
+    "./aggregated_commitment.bin",
+    
 )

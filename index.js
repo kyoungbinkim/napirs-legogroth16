@@ -247,6 +247,8 @@ const {
   getAggregatedCommitmentBls12381,
   aggregateOpeningKeysBn128,
   aggregateOpeningKeysBls12381,
+  updateAggregatedCommitmentBn128,
+  updateAggregatedCommitmentBls12381,
   calculatePedersenCommitmentBn128,
 } = nativeBinding
 
@@ -262,4 +264,6 @@ module.exports.getAggregatedCommitmentBn128 = getAggregatedCommitmentBn128
 module.exports.getAggregatedCommitmentBls12381 = getAggregatedCommitmentBls12381
 module.exports.aggregateOpeningKeysBn128 = aggregateOpeningKeysBn128
 module.exports.aggregateOpeningKeysBls12381 = aggregateOpeningKeysBls12381
+module.exports.updateAggregatedCommitmentBn128 = updateAggregatedCommitmentBn128
+module.exports.updateAggregatedCommitmentBls12381 = updateAggregatedCommitmentBls12381
 module.exports.calculatePedersenCommitmentBn128 = calculatePedersenCommitmentBn128
