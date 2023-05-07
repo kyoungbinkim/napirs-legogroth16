@@ -245,6 +245,7 @@ pub fn aggregated_pedersen_commitment_opening_keys<E:Pairing>(
 }
 
 // 너무 코드가 드러움....... 고치기는 귀찮아 ..................
+// 변수 리팩토링 해야함
 // proof file path : updated user proof 
 // aggregated_commitment_file_path : aggregated commitment
 pub fn update_aggregated_commitment<E:Pairing>(

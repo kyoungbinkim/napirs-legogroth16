@@ -12,6 +12,8 @@ const {
 
 const fs = require('fs');
 
+const bn128FieldPrime = BigInt("21888242871839275222246405745257275088548364400416034343698204186575808495617");
+
 setupFromCircomR1CsBn128(
     "./circom/bn128/range_proof.r1cs",
     1,
@@ -43,7 +45,7 @@ proveRangeBn128(
     "./circom/bn128/range_proof.wasm",
     "./range_pk.bin",
     "./test_proof3.bin",
-    "0x00101000",
+    "0x1111111111111111",
     1223
 );
 
@@ -84,7 +86,7 @@ aggregateOpeningKeysBn128(
     "./aggregated_opening_key.json"
 )
 
-const aggregatedOpeningKeyJson = JSON.parse(fs.readFileSync("./aggregated_opening_key.json"));
+let aggregatedOpeningKeyJson = JSON.parse(fs.readFileSync("./aggregated_opening_key.json"));
 console.log(
     "calculated aggregated commitment:",
     calculatePedersenCommitmentBn128(
@@ -97,16 +99,34 @@ console.log(
 console.log(
     "from aggregated proof :",
     getAggregatedCommitmentBn128(
-        "./aggregated_commitmen😭t.bin"
+        "./aggregated_commitment.bin"
     )
 )
 
-// TODO : 테스트 해보기😭
 updateAggregatedCommitmentBn128(
     "./circom/bn128/range_proof.r1cs",
-    "./circom/bn128/range_proof.wasm",
     "./range_pk.bin",
+    "./circom/bn128/range_proof.wasm",
     "./test_proof3.bin",
     "./aggregated_commitment.bin",
-    
+    "./aggregated_opening_key.json",
+    "0xffffffffffffffff",
+    333111
+);
+
+aggregatedOpeningKeyJson = JSON.parse(fs.readFileSync("./aggregated_opening_key.json"));
+console.log(
+    "calculated aggregated commitment:",
+    calculatePedersenCommitmentBn128(
+        "./range_pk.bin", 
+        aggregatedOpeningKeyJson["m"], 
+        aggregatedOpeningKeyJson["v"]
+    )
+);
+
+console.log(
+    "from aggregated proof :",
+    getAggregatedCommitmentBn128(
+        "./aggregated_commitment.bin"
+    )
 )
