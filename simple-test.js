@@ -1,3 +1,4 @@
+const fs = require('fs')
 const {
   setupFromCircomR1CsBn128,
   proveRangeBn128,
@@ -7,12 +8,10 @@ const {
   getAggregatedCommitmentBn128,
   aggregateOpeningKeysBn128,
   calculatePedersenCommitmentBn128,
-  updateAggregatedCommitmentBn128
+  updateAggregatedCommitmentBn128,
 } = require('./index.js')
 
-const fs = require('fs');
-
-const bn128FieldPrime = BigInt("21888242871839275222246405745257275088548364400416034343698204186575808495617");
+const bn128FieldPrime = BigInt("21888242871839275222246405745257275088548364400416034343698204186575808495617")
 
 setupFromCircomR1CsBn128(
     "./circom/bn128/range_proof.r1cs",
@@ -20,7 +19,7 @@ setupFromCircomR1CsBn128(
     13323,
     "./range_pk.bin",
     "./range_vk.bin"
-);
+)
 
 proveRangeBn128(
     "./circom/bn128/range_proof.r1cs",
@@ -29,7 +28,7 @@ proveRangeBn128(
     "./test_proof1.bin",
     "0xfffffffffffffff0",
     1223
-);
+)
 
 proveRangeBn128(
     "./circom/bn128/range_proof.r1cs",
@@ -38,7 +37,7 @@ proveRangeBn128(
     "./test_proof2.bin",
     "0xffffa",
     1223
-);
+)
 
 proveRangeBn128(
     "./circom/bn128/range_proof.r1cs",
@@ -47,25 +46,25 @@ proveRangeBn128(
     "./test_proof3.bin",
     "0x1111111111111111",
     1223
-);
+)
 
 verifyRangeBn128(
     "./range_vk.bin",
     "./test_proof1.bin"
-);
+)
 
-const proofString = getProofBn128("./test_proof1.bin");
-console.log(proofString);
-console.log(JSON.parse(proofString));
+const proofString = getProofBn128("./test_proof1.bin")
+console.log(proofString)
+console.log(JSON.parse(proofString))
 
-const test1Json = JSON.parse(fs.readFileSync("./test_proof1_opening_key.json"));
+const test1Json = JSON.parse(fs.readFileSync("./test_proof1_opening_key.json"))
 console.log(
     calculatePedersenCommitmentBn128(
         "./range_pk.bin", 
         test1Json["m"], 
         test1Json["v"]
     )
-);
+)
 
 aggregateProofCommitmentBn128(
     [
@@ -94,7 +93,7 @@ console.log(
         aggregatedOpeningKeyJson["m"], 
         aggregatedOpeningKeyJson["v"]
     )
-);
+)
 
 console.log(
     "from aggregated proof :",
@@ -112,7 +111,7 @@ updateAggregatedCommitmentBn128(
     "./aggregated_opening_key.json",
     "0xffffffffffffffff",
     333111
-);
+)
 
 aggregatedOpeningKeyJson = JSON.parse(fs.readFileSync("./aggregated_opening_key.json"));
 console.log(
@@ -122,7 +121,7 @@ console.log(
         aggregatedOpeningKeyJson["m"], 
         aggregatedOpeningKeyJson["v"]
     )
-);
+)
 
 console.log(
     "from aggregated proof :",
