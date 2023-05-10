@@ -15,7 +15,11 @@ pub fn verify<
     let vk_bin = read(abs_path(vk_path)).unwrap();
     let pk_bin = read(abs_path(proof_path)).unwrap();
 
-    let verifing_key = VerifyingKey::<E>::deserialize_compressed(&*vk_bin).unwrap();
+    let verifing_key = VerifyingKey::<E>::deserialize_compressed(&*vk_bin);
+    let verifing_key = match verifing_key { 
+        Ok(verifing_key) => verifing_key,
+        Err(_e) => return false
+    };
     let prepared_vk = prepare_verifying_key::<E>(&verifing_key);
 
     let proof = Proof::<E>::deserialize_compressed(&*pk_bin).unwrap();
