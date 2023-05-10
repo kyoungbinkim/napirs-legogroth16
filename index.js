@@ -240,6 +240,7 @@ const {
   proveRangeBn128,
   proveRangeBls12381,
   verifyRangeBn128,
+  verifyRangeBls12381,
   getProofBn128,
   aggregateProofCommitmentBn128,
   aggregateProofCommitmentBls12381,
@@ -257,6 +258,7 @@ module.exports.setupFromCircomR1CsBls12381 = setupFromCircomR1CsBls12381
 module.exports.proveRangeBn128 = proveRangeBn128
 module.exports.proveRangeBls12381 = proveRangeBls12381
 module.exports.verifyRangeBn128 = verifyRangeBn128
+module.exports.verifyRangeBls12381 = verifyRangeBls12381
 module.exports.getProofBn128 = getProofBn128
 module.exports.aggregateProofCommitmentBn128 = aggregateProofCommitmentBn128
 module.exports.aggregateProofCommitmentBls12381 = aggregateProofCommitmentBls12381

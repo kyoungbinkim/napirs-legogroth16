@@ -33,7 +33,8 @@ export function proveRangeBls12381(
   inputString: string,
   seed: number,
 ): void
-export function verifyRangeBn128(vkPath: string, proofFilePath: string): void
+export function verifyRangeBn128(vkPath: string, proofFilePath: string): boolean
+export function verifyRangeBls12381(vkPath: string, proofFilePath: string): boolean
 export function getProofBn128(proofFilePath: string): string
 export function aggregateProofCommitmentBn128(proofFilePaths: Array<string>, saveFilePath: string): void
 export function aggregateProofCommitmentBls12381(proofFilePaths: Array<string>, saveFilePath: string): void

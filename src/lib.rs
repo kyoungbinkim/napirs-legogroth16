@@ -118,12 +118,24 @@ pub fn prove_range_bls12_381(
 pub fn verify_range_bn128(
   vk_path : String,
   proof_file_path : String,
-) {
+) -> bool{
   verifier::verify::<Bn254>(
     vk_path.as_str(), 
     proof_file_path.as_str(), 
     vec![]
-  );
+  )
+}
+
+#[napi]
+pub fn verify_range_bls12_381(
+  vk_path : String,
+  proof_file_path : String
+) -> bool {
+  verifier::verify::<Bls12_381>(
+    vk_path.as_str(), 
+    proof_file_path.as_str(), 
+    vec![]
+  )
 }
 
 #[napi]

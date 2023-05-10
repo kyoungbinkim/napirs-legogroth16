@@ -48,9 +48,12 @@ proveRangeBn128(
     1223
 )
 
-verifyRangeBn128(
-    "./range_vk.bin",
-    "./test_proof1.bin"
+console.log(
+    "verify :\t", 
+    verifyRangeBn128(
+        "./range_vk.bin",
+        "./test_proof1.bin"
+    )
 )
 
 const proofString = getProofBn128("./test_proof1.bin")
