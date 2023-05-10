@@ -22,7 +22,11 @@ pub fn verify<
     };
     let prepared_vk = prepare_verifying_key::<E>(&verifing_key);
 
-    let proof = Proof::<E>::deserialize_compressed(&*pk_bin).unwrap();
+    let proof = Proof::<E>::deserialize_compressed(&*pk_bin);
+    let proof = match proof{
+        Ok(proof) => proof,
+        Err(_e) => return false
+    };
 
     let ver = verify_proof(&prepared_vk, &proof, &public_inputs);
     match ver {
