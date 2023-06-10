@@ -1,7 +1,10 @@
 use ark_ec::pairing::Pairing;
 use legogroth16::{VerifyingKey, prepare_verifying_key, verify_proof, Proof};
 use ark_serialize::CanonicalDeserialize;
-use std::fs::read;
+use std::{
+    fs::read,
+    time::SystemTime
+};
 
 use crate::keys::abs_path;
 
@@ -28,7 +31,13 @@ pub fn verify<
         Err(_e) => return false
     };
 
+    let verify_start_time = SystemTime::now();
     let ver = verify_proof(&prepared_vk, &proof, &public_inputs);
+    let verify_end_time = SystemTime::now();
+    let verify_duration = verify_end_time.duration_since(verify_start_time)
+        .expect("SystemTime::duration_since failed");
+    println!("verify time: {:?}", verify_duration);
+    
     match ver {
         Ok(()) => return true,
         Err(_e) => return false

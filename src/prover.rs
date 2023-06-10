@@ -22,6 +22,7 @@ use legogroth16::{
 use std::{
     fs::{write, read},
     collections::HashMap,
+    time::SystemTime
 };
 use hex::ToHex;
 
@@ -64,7 +65,12 @@ pub fn prove<
     let mut rng = StdRng::seed_from_u64(seed);
     let v: <E as Pairing>::ScalarField = E::ScalarField::rand(&mut rng);
     
+    let prove_start_time= SystemTime::now();
     let proof = create_random_proof(circuit, v, &proving_key, &mut rng).unwrap();
+    let prove_end_time = SystemTime::now();
+    let prove_duration = prove_end_time.duration_since(prove_start_time)
+        .expect("SystemTime::duration_since failed");
+    println!("prove time: {:?}", prove_duration);
     
     // to debug
     // println!("committed wit : {:?}", committed_witnesses);

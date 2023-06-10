@@ -2,7 +2,8 @@ use std::path::PathBuf;
 use ark_ec::{pairing::Pairing, CurveGroup};
 use ark_std::{
     rand::{rngs::StdRng, SeedableRng},
-    UniformRand
+    UniformRand, 
+    time::SystemTime
 };
 use ark_bn254::{Bn254};
 use ark_bls12_381::Bls12_381;
@@ -51,7 +52,14 @@ pub fn setup_from_circom_r1cs<E:Pairing>(
     seed:u64
 ) -> (ProvingKeyWithLink<E>, ProvingKey<E>, Vec<E::G1Affine>){
     let circuit: CircomCircuit<E> = CircomCircuit::<E>::from_r1cs_file(abs_path(r1cs_file_path)).unwrap();
-    gen_params::<E>(commit_witness_count, circuit.clone(), seed)
+
+    let start_time = SystemTime::now();
+    let tmp = gen_params::<E>(commit_witness_count, circuit.clone(), seed);
+    let end_time = SystemTime::now();
+    let duration = end_time.duration_since(start_time)
+        .expect("SystemTime::duration_since failed");
+    println!("setup time: {:?}", duration);
+    tmp
 }
 
 pub fn setup_from_circom_r1cs_bn128(
