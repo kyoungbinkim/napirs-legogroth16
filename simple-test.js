@@ -12,11 +12,28 @@ const {
 } = require('./index.js')
 
 const bn128FieldPrime = BigInt("21888242871839275222246405745257275088548364400416034343698204186575808495617")
+const seed =  Math.floor( Math.random() * 1000000 );
 
 setupFromCircomR1CsBn128(
     "./circom/bn128/range_proof.r1cs",
     1,
-    13323,
+    seed,
+    "./range_pk.bin",
+    "./range_vk.bin"
+)
+
+setupFromCircomR1CsBn128(
+    "./circom/bn128/range_proof.r1cs",
+    1,
+    seed+12,
+    "./range_pk.bin",
+    "./range_vk.bin"
+)
+
+setupFromCircomR1CsBn128(
+    "./circom/bn128/range_proof.r1cs",
+    1,
+    seed+23,
     "./range_pk.bin",
     "./range_vk.bin"
 )
@@ -49,10 +66,24 @@ proveRangeBn128(
 )
 
 console.log(
-    "verify :\t", 
+    "verify : ", 
     verifyRangeBn128(
         "./range_vk.bin",
         "./test_proof1.bin"
+    )
+)
+console.log(
+    "verify : ", 
+    verifyRangeBn128(
+        "./range_vk.bin",
+        "./test_proof2.bin"
+    )
+)
+console.log(
+    "verify : ", 
+    verifyRangeBn128(
+        "./range_vk.bin",
+        "./test_proof3.bin"
     )
 )
 
